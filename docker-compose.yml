@@ -1,0 +1,40 @@
+version: '3'
+services:
+  mysql:
+    image: mysql:latest
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: docker
+      MYSQL_USER: User1
+      MYSQL_PASSWORD: root
+    ports:
+      - "3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+
+  php:
+    image: php:8.2-fpm
+    restart: always
+    volumes:
+      - ./demo:/var/www/html
+      - php_logs:/var/log/php
+    depends_on:
+      - mysql
+
+  nginx:
+    image: nginx:latest
+    restart: always
+    ports:
+      - "80:80"
+    volumes:
+      - ./demo:/var/www/html
+      - ./nginx_logs:/var/log/nginx
+      - ./nginx_conf:/etc/nginx/conf.d
+    depends_on:
+      - php
+
+volumes:
+  mysql_data: {}
+  php_logs: {}
+  nginx_logs: {}
